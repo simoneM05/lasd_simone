@@ -14,7 +14,8 @@ namespace lasd
   /* ************************************************************************** */
 
   template <typename Data>
-  class LinearContainer : virtual public PreOrderTraversableContainer<Data>,
+  class 
+  LinearContainer : virtual public PreOrderTraversableContainer<Data>,
                           virtual public PostOrderTraversableContainer<Data>
   {
 

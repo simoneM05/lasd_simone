@@ -19,16 +19,13 @@ namespace lasd
                  virtual public List<Data> // Must extend List<Data>
 
   {
-    // Must extend Set<Data>,
-    //             List<Data>
 
   private:
-    // ...
-
   protected:
     using Container::size;
-
-    // ...
+    using List<Data>::Node;
+    using List<Data>::head;
+    using List<Data>::tail;
 
   public:
     // Default constructor
@@ -37,8 +34,8 @@ namespace lasd
     /* ************************************************************************ */
 
     // Specific constructors
-    SetLst(const TraversableContainer<Data> &) specifiers; // A set obtained from a TraversableContainer
-    SetLst(MappableContainer<Data> &&) specifiers;         // A set obtained from a MappableContainer
+    SetLst(const TraversableContainer<Data> &); // A set obtained from a TraversableContainer
+    SetLst(MappableContainer<Data> &&);         // A set obtained from a MappableContainer
 
     /* ************************************************************************ */
 
@@ -99,7 +96,7 @@ namespace lasd
 
     // Specific member functions (inherited from LinearContainer)
 
-    const Data operator[](unsigned long) specifiers; // Override LinearContainer member (must throw std::out_of_range when out of range)
+    const Data &operator[](unsigned long) const override; // Override LinearContainer member (must throw std::out_of_range when out of range)
 
     /* ************************************************************************** */
 
