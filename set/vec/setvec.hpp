@@ -1,4 +1,3 @@
-
 #ifndef SETVEC_HPP
 #define SETVEC_HPP
 
@@ -19,6 +18,8 @@ namespace lasd
   {
 
   private:
+    Vector<Data> elements; // Aggiungiamo un vettore per memorizzare gli elementi
+
   protected:
     using Container::size;
 
@@ -101,6 +102,14 @@ namespace lasd
     // Specific member function (inherited from ClearableContainer)
 
     void Clear() override; // Override ClearableContainer member
+
+    /* ************************************************************************ */
+
+    // Specific member function (inherited from ResizableContainer)
+
+    // Implementiamo il metodo mancante Resize
+    virtual void Resize(unsigned long) override; // Override ResizableContainer member
+
     /* ************************************************************************ */
   protected:
     // Auxiliary functions, if necessary!

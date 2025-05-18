@@ -1,4 +1,3 @@
-
 #include "list.hpp"
 
 namespace lasd
@@ -8,19 +7,18 @@ namespace lasd
 
     // Specific constructor (Node)
     template <typename Data>
-    List<Data>::Node::Node(Data &&dat) noexcept
+    List<Data>::Node::Node(Data &&dat) noexcept : element(std::move(dat))
     {
-        std::swap(element, dat);
+        // Using direct initialization with std::move instead of std::swap
     }
 
     /* ************************************************************************** */
 
     // Move constructor (Node)
     template <typename Data>
-    List<Data>::Node::Node(Node &&nod) noexcept
+    List<Data>::Node::Node(Node &&nod) noexcept : element(std::move(nod.element)), next(nod.next)
     {
-        std::swap(element, nod.element);
-        std::swap(next, nod.next);
+        nod.next = nullptr; // Prevent the moved-from node from deleting our next pointer
     }
 
     /* ************************************************************************** */
@@ -310,6 +308,78 @@ namespace lasd
         }
         tail = end;
         ++size;
+    }
+
+    // Missing functions implementation
+    template <typename Data>
+    void List<Data>::RemoveFromBack()
+    {
+        if (tail == nullptr)
+        {
+            throw std::length_error("Access to an empty list.");
+        }
+
+        if (head == tail)
+        {
+            // Only one element in the list
+            delete head;
+            head = tail = nullptr;
+        }
+        else
+        {
+            // More than one element in the list
+            Node *current = head;
+
+            // Find the node before tail
+            while (current->next != tail)
+            {
+                current = current->next;
+            }
+
+            // current now points to the node before tail
+            current->next = nullptr;
+            delete tail;
+            tail = current;
+        }
+
+        --size;
+    }
+
+    template <typename Data>
+    Data List<Data>::BackNRemove()
+    {
+        if (tail == nullptr)
+        {
+            throw std::length_error("Access to an empty list.");
+        }
+
+        Data result = tail->element;
+
+        if (head == tail)
+        {
+            // Only one element in the list
+            delete head;
+            head = tail = nullptr;
+        }
+        else
+        {
+            // More than one element in the list
+            Node *current = head;
+
+            // Find the node before tail
+            while (current->next != tail)
+            {
+                current = current->next;
+            }
+
+            // current now points to the node before tail
+            current->next = nullptr;
+            delete tail;
+            tail = current;
+        }
+
+        --size;
+        return result;
     }
 
     /* ************************************************************************** */

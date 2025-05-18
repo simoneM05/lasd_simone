@@ -4,6 +4,22 @@ namespace lasd
 
     /* ************************************************************************** */
 
+    // Aggiungi questi costruttori al tuo file setlst.cpp
+
+    // Copy constructor
+    template <typename Data>
+    SetLst<Data>::SetLst(const SetLst<Data> &set) : List<Data>(set)
+    {
+        // Il costruttore di copia della classe List<Data> fa già tutto il lavoro necessario
+    }
+
+    // Move constructor
+    template <typename Data>
+    SetLst<Data>::SetLst(SetLst<Data> &&set) noexcept : List<Data>(std::move(set))
+    {
+        // Il costruttore di spostamento della classe List<Data> fa già tutto il lavoro necessario
+    }
+
     template <typename Data>
     SetLst<Data>::SetLst(const TraversableContainer<Data> &cont) : List<Data>(cont)
     {

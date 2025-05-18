@@ -1,247 +1,350 @@
-
-#include "setvec.hpp"
-
 namespace lasd
 {
 
-    // Costruttore da TraversableContainer
+    /* ************************************************************************** */
+
+    // Specific constructors
+
     template <typename Data>
     SetVec<Data>::SetVec(const TraversableContainer<Data> &container)
     {
-        // Implementazione per costruire SetVec da un TraversableContainer
+        container.Traverse([this](const Data &data)
+                           {
+                               this->Insert(data); // Usa Insert per garantire l'unicità degli elementi
+                           });
     }
 
-    // Costruttore da MappableContainer
     template <typename Data>
     SetVec<Data>::SetVec(MappableContainer<Data> &&container)
     {
-        // Implementazione per costruire SetVec da un MappableContainer
+        container.Map([this](Data &data)
+                      {
+                          this->Insert(std::move(data)); // Usa Insert con move per garantire l'unicità
+                      });
     }
 
-    // Costruttore di copia
+    /* ************************************************************************** */
+
+    // Copy constructor
     template <typename Data>
-    SetVec<Data>::SetVec(const SetVec &other)
-    {
-        // Implementazione del costruttore di copia
-    }
+    SetVec<Data>::SetVec(const SetVec<Data> &set) : elements(set.elements) {}
 
-    // Costruttore di spostamento
+    // Move constructor
     template <typename Data>
-    SetVec<Data>::SetVec(SetVec &&other) noexcept
-    {
-        // Implementazione del costruttore di spostamento
-    }
+    SetVec<Data>::SetVec(SetVec<Data> &&set) noexcept : elements(std::move(set.elements)) {}
 
-    // Distruttore
+    /* ************************************************************************** */
+
+    // Destructor
     template <typename Data>
     SetVec<Data>::~SetVec()
     {
-        // Gestione della distruzione del SetVec, liberazione di risorse se necessario
+        Clear();
     }
 
-    // Operatore di copia
+    /* ************************************************************************** */
+
+    // Copy assignment
     template <typename Data>
-    SetVec<Data> &SetVec<Data>::operator=(const SetVec &other)
+    SetVec<Data> &SetVec<Data>::operator=(const SetVec<Data> &set)
     {
-        // Implementazione dell'operatore di assegnazione di copia
-        if (this != &other)
+        if (this != &set)
         {
-            // Copia dei dati da 'other'
+            elements = set.elements;
         }
         return *this;
     }
 
-    // Operatore di spostamento
+    // Move assignment
     template <typename Data>
-    SetVec<Data> &SetVec<Data>::operator=(SetVec &&other) noexcept
+    SetVec<Data> &SetVec<Data>::operator=(SetVec<Data> &&set) noexcept
     {
-        // Implementazione dell'operatore di spostamento
-        if (this != &other)
+        if (this != &set)
         {
-            // Spostamento dei dati da 'other'
+            elements = std::move(set.elements);
         }
         return *this;
     }
 
-    // Operatore di uguaglianza
+    /* ************************************************************************** */
+
+    // Comparison operators
     template <typename Data>
-    bool SetVec<Data>::operator==(const SetVec &other) const noexcept
+    inline bool SetVec<Data>::operator==(const SetVec<Data> &set) const noexcept
     {
-        // Implementazione per il confronto di uguaglianza
-        return false; // Placeholder, da modificare
+        if (size != set.size)
+            return false;
+
+        for (unsigned long i = 0; i < size; i++)
+        {
+            if (!set.Exists(elements[i]))
+                return false;
+        }
+        return true;
     }
 
-    // Operatore di disuguaglianza
     template <typename Data>
-    bool SetVec<Data>::operator!=(const SetVec &other) const noexcept
+    inline bool SetVec<Data>::operator!=(const SetVec<Data> &set) const noexcept
     {
-        // Implementazione per il confronto di disuguaglianza
-        return !(*this == other);
+        return !(*this == set);
     }
 
-    // Min
+    /* ************************************************************************** */
+
+    // Specific member functions (inherited from OrderedDictionaryContainer)
+
     template <typename Data>
     Data SetVec<Data>::Min() const
     {
         if (size == 0)
+            throw std::length_error("Set is empty!");
+
+        Data min = elements[0];
+        for (unsigned long i = 1; i < size; i++)
         {
-            throw std::length_error("SetVec is empty");
+            if (elements[i] < min)
+            {
+                min = elements[i];
+            }
         }
-        // Logica per trovare il minimo
+        return min;
     }
 
-    // MinNRemove
     template <typename Data>
     Data SetVec<Data>::MinNRemove()
     {
-        if (size == 0)
-        {
-            throw std::length_error("SetVec is empty");
-        }
-        // Logica per trovare il minimo e rimuoverlo
+        Data min = Min();
+        RemoveMin();
+        return min;
     }
 
-    // RemoveMin
     template <typename Data>
     void SetVec<Data>::RemoveMin()
     {
         if (size == 0)
-        {
-            throw std::length_error("SetVec is empty");
-        }
-        // Logica per rimuovere il minimo
+            throw std::length_error("Set is empty!");
+
+        Data min = Min();
+        Remove(min);
     }
 
-    // Max
     template <typename Data>
     Data SetVec<Data>::Max() const
     {
         if (size == 0)
+            throw std::length_error("Set is empty!");
+
+        Data max = elements[0];
+        for (unsigned long i = 1; i < size; i++)
         {
-            throw std::length_error("SetVec is empty");
+            if (elements[i] > max)
+            {
+                max = elements[i];
+            }
         }
-        // Logica per trovare il massimo
+        return max;
     }
 
-    // MaxNRemove
     template <typename Data>
     Data SetVec<Data>::MaxNRemove()
     {
-        if (size == 0)
-        {
-            throw std::length_error("SetVec is empty");
-        }
-        // Logica per trovare il massimo e rimuoverlo
+        Data max = Max();
+        RemoveMax();
+        return max;
     }
 
-    // RemoveMax
     template <typename Data>
     void SetVec<Data>::RemoveMax()
     {
         if (size == 0)
-        {
-            throw std::length_error("SetVec is empty");
-        }
-        // Logica per rimuovere il massimo
+            throw std::length_error("Set is empty!");
+
+        Data max = Max();
+        Remove(max);
     }
 
-    // Predecessor
     template <typename Data>
     Data SetVec<Data>::Predecessor(const Data &data) const
     {
-        // Logica per trovare il predecessore
-        throw std::length_error("Predecessor not found");
+        if (size == 0)
+            throw std::length_error("Set is empty!");
+
+        bool found = false;
+        Data pred = data;
+
+        for (unsigned long i = 0; i < size; i++)
+        {
+            if (elements[i] < data && (!found || elements[i] > pred))
+            {
+                pred = elements[i];
+                found = true;
+            }
+        }
+
+        if (!found)
+            throw std::length_error("Predecessor not found!");
+        return pred;
     }
 
-    // PredecessorNRemove
     template <typename Data>
     Data SetVec<Data>::PredecessorNRemove(const Data &data)
     {
-        // Logica per trovare e rimuovere il predecessore
-        throw std::length_error("Predecessor not found");
+        Data pred = Predecessor(data);
+        RemovePredecessor(data);
+        return pred;
     }
 
-    // RemovePredecessor
     template <typename Data>
     void SetVec<Data>::RemovePredecessor(const Data &data)
     {
-        // Logica per rimuovere il predecessore
-        throw std::length_error("Predecessor not found");
+        if (size == 0)
+            throw std::length_error("Set is empty!");
+
+        Data pred = Predecessor(data);
+        Remove(pred);
     }
 
-    // Successor
     template <typename Data>
     Data SetVec<Data>::Successor(const Data &data) const
     {
-        // Logica per trovare il successore
-        throw std::length_error("Successor not found");
+        if (size == 0)
+            throw std::length_error("Set is empty!");
+
+        bool found = false;
+        Data succ = data;
+
+        for (unsigned long i = 0; i < size; i++)
+        {
+            if (elements[i] > data && (!found || elements[i] < succ))
+            {
+                succ = elements[i];
+                found = true;
+            }
+        }
+
+        if (!found)
+            throw std::length_error("Successor not found!");
+        return succ;
     }
 
-    // SuccessorNRemove
     template <typename Data>
     Data SetVec<Data>::SuccessorNRemove(const Data &data)
     {
-        // Logica per trovare e rimuovere il successore
-        throw std::length_error("Successor not found");
+        Data succ = Successor(data);
+        RemoveSuccessor(data);
+        return succ;
     }
 
-    // RemoveSuccessor
     template <typename Data>
     void SetVec<Data>::RemoveSuccessor(const Data &data)
     {
-        // Logica per rimuovere il successore
-        throw std::length_error("Successor not found");
+        if (size == 0)
+            throw std::length_error("Set is empty!");
+
+        Data succ = Successor(data);
+        Remove(succ);
     }
 
-    // Insert (const Data&)
+    /* ************************************************************************** */
+
+    // Specific member functions (inherited from DictionaryContainer)
+
     template <typename Data>
     bool SetVec<Data>::Insert(const Data &data)
     {
-        return false; // Placeholder, da modificare
-        // Implementazione della funzione Insert per l'inserimento di un elemento
+        if (!Exists(data))
+        {
+            elements.Resize(size + 1);
+            elements[size - 1] = data;
+            return true;
+        }
+        return false;
     }
 
-    // Insert (Data&&)
     template <typename Data>
     bool SetVec<Data>::Insert(Data &&data)
     {
-        return false; // Placeholder, da modificare
-        // Implementazione della funzione Insert per l'inserimento di un elemento tramite move
+        if (!Exists(data))
+        {
+            elements.Resize(size + 1);
+            elements[size - 1] = std::move(data);
+            return true;
+        }
+        return false;
     }
 
-    // Remove
     template <typename Data>
     bool SetVec<Data>::Remove(const Data &data)
     {
-        return false; // Placeholder, da modificare
-        // Implementazione della funzione Remove
+        for (unsigned long i = 0; i < size; i++)
+        {
+            if (elements[i] == data)
+            {
+                // Replace current element with last element and resize
+                if (i < size - 1)
+                {
+                    elements[i] = std::move(elements[size - 1]);
+                }
+                elements.Resize(size - 1);
+                return true;
+            }
+        }
+        return false;
     }
 
-    // Operatore di indicizzazione
+    /* ************************************************************************** */
+
+    // Specific member functions (inherited from LinearContainer)
+
     template <typename Data>
     const Data &SetVec<Data>::operator[](unsigned long index) const
     {
         if (index >= size)
-        {
             throw std::out_of_range("Index out of range");
-        }
-        // Restituisci il valore corrispondente
+        return elements[index];
     }
 
-    // Exists
+    /* ************************************************************************** */
+
+    // Specific member function (inherited from TestableContainer)
+
     template <typename Data>
     bool SetVec<Data>::Exists(const Data &data) const noexcept
     {
-        return false; // Placeholder, da modificare
-        // Verifica se un elemento esiste nel SetVec
+        for (unsigned long i = 0; i < size; i++)
+        {
+            if (elements[i] == data)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
-    // Clear
-    template <typename Data>
-    void SetVec<Data>::Clear() {
-        // Logica per liberare la memoria o svuotare la struttura
-    };
+    /* ************************************************************************** */
 
-    // Inserire altre funzioni ausiliarie se necessarie
+    // Specific member function (inherited from ClearableContainer)
+
+    template <typename Data>
+    void SetVec<Data>::Clear()
+    {
+        elements.Clear();
+    }
+
+    /* ************************************************************************** */
+
+    // Specific member function (inherited from ResizableContainer)
+
+    template <typename Data>
+    void SetVec<Data>::Resize(unsigned long newSize)
+    {
+        if (newSize < size)
+        {
+            elements.Resize(newSize);
+        }
+        // Se newSize >= size, non facciamo nulla poiché un set non può avere elementi vuoti
+    }
+
+    /* ************************************************************************** */
 
 } // namespace lasd

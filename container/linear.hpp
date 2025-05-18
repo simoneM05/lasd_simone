@@ -1,4 +1,3 @@
-
 #ifndef LINEAR_HPP
 #define LINEAR_HPP
 
@@ -14,9 +13,9 @@ namespace lasd
   /* ************************************************************************** */
 
   template <typename Data>
-  class 
-  LinearContainer : virtual public PreOrderTraversableContainer<Data>,
-                          virtual public PostOrderTraversableContainer<Data>
+  class
+      LinearContainer : virtual public PreOrderTraversableContainer<Data>,
+                        virtual public PostOrderTraversableContainer<Data>
   {
 
   private:
@@ -98,7 +97,14 @@ namespace lasd
 
     // Specific member functions
 
+    // Importa l'operatore della classe base
+    using LinearContainer<Data>::operator[];
+
     virtual Data &operator[](unsigned long) = 0; // (mutable version; concrete function must throw std::out_of_range when out of range)
+
+    // Importa le funzioni della classe base
+    using LinearContainer<Data>::Front;
+    using LinearContainer<Data>::Back;
 
     inline virtual Data &Front(); // (mutable version; concrete function must throw std::length_error when empty)
 
